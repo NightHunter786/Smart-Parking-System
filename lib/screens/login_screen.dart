@@ -19,7 +19,7 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      backgroundColor: Colors.blueGrey, // Set background color here
+      backgroundColor: Colors.lightBlue, // Set background color here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -27,13 +27,25 @@ class LoginScreen extends StatelessWidget {
           children: <Widget>[
             TextField(
               controller: usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
+              decoration: InputDecoration(
+                labelText: 'Username',
+                labelStyle: TextStyle(color: Colors.black),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                ),
+              ),
             ),
             SizedBox(height: 16),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.black),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                ),
+              ),
             ),
             SizedBox(height: 32),
             ElevatedButton(
@@ -97,7 +109,7 @@ class RegistrationScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Registration'),
       ),
-      backgroundColor: Colors.blueGrey, // Set background color here
+      backgroundColor: Colors.lightBlue, // Set background color here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -105,13 +117,25 @@ class RegistrationScreen extends StatelessWidget {
           children: <Widget>[
             TextField(
               controller: usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
+              decoration: InputDecoration(
+                labelText: 'Username',
+                labelStyle: TextStyle(color: Colors.black),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                ),
+              ),  
             ),
             SizedBox(height: 16),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.black),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                ),
+              ),
             ),
             SizedBox(height: 32),
             ElevatedButton(

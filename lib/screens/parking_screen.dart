@@ -22,6 +22,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
       appBar: AppBar(
         title: Text('Parking Screen'),
       ),
+      backgroundColor: Colors.lightBlue,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
