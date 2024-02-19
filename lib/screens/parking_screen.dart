@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'booking_screen.dart'; // Import BookingScreen widget
 
 class ParkingScreen extends StatefulWidget {
   final ApiService apiService;
@@ -37,12 +38,15 @@ class _ParkingScreenState extends State<ParkingScreen> {
                 try {
                   var dataSnapshot = await widget.apiService.fetchSlots();
                   if (dataSnapshot != null) {
-                    var slotsData = dataSnapshot.value as Map<dynamic, dynamic>;
+                    var slotsData =
+                        dataSnapshot.value as Map<dynamic, dynamic>;
                     List<Map<String, dynamic>> fetchedSlots = [];
                     slotsData.forEach((key, value) {
+                      // Add this print statement to inspect the availability values
+                      print('Availability for slot $key: ${value['availability']}');
                       fetchedSlots.add({
                         'slotNumber': key,
-                        'status': value['availability'],
+                        'status': value['availability'] == true,
                         'entryTime': value['entry_time'],
                         'exitTime': value['exit_time'],
                         'occupancyStatus': value['occupancy_status'],
@@ -51,6 +55,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
                     });
                     setState(() {
                       slots = fetchedSlots;
+                      print('Updated slots: $slots');
                     });
                   } else {
                     print('Fetched slots are null');
@@ -69,12 +74,30 @@ class _ParkingScreenState extends State<ParkingScreen> {
                   Color buttonColor = slots[index]['status'] == true //bool value not string
                       ? Colors.green
                       : Colors.red;
-                  print('Slot ${slots[index]['slotNumber']} status: ${slots[index]['status']}');
+                  print(
+                      'Slot ${slots[index]['slotNumber']} status: ${slots[index]['status']}');
 
                   return ListTile(
                     title: ElevatedButton(
                       onPressed: () {
-                        // Handle button press if needed
+                        if (slots[index]['status'] == true) {
+                          // Navigate to BookingScreen if slot is available
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BookingScreen(
+                                slotNumber: int.parse(slots[index]['slotNumber'].replaceAll('slot', '')),
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Show snackbar indicating slot is unavailable
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Slot is unavailable'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         primary: buttonColor,
