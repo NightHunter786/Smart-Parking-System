@@ -19,6 +19,7 @@ class _BookingScreenState extends State<BookingScreen> {
       appBar: AppBar(
         title: Text('Booking Screen'),
       ),
+      backgroundColor: Colors.lightBlue,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
