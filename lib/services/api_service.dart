@@ -1,22 +1,19 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:firebase_database/firebase_database.dart';
 
 class ApiService {
-  final String baseUrl;
+  final DatabaseReference _database;
 
-  ApiService({required this.baseUrl});
+  ApiService({required DatabaseReference database}) : _database = database;
 
-  Future<List<Map<String, dynamic>>> fetchSlots() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/slots'));
-
-    if (response.statusCode == 200) {
-      // Parse the JSON response using json.decode
-      List<Map<String, dynamic>> slots =
-          List<Map<String, dynamic>>.from(json.decode(response.body));
-      return slots;
-    } else {
-      // Handle errors
-      throw Exception('Failed to fetch slots');
+  Future<DataSnapshot> fetchSlots() async {
+    try {
+      // Use the `once()` method to listen for a single event
+      DatabaseEvent event = await _database.child('parking_slots').once();
+      DataSnapshot dataSnapshot = event.snapshot; // Get the DataSnapshot from the DatabaseEvent
+      return dataSnapshot;
+    } catch (e) {
+      print('Error fetching slots: $e');
+      throw e;
     }
   }
 }

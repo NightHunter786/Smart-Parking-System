@@ -35,12 +35,26 @@ class _ParkingScreenState extends State<ParkingScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  List<Map<String, dynamic>> fetchedSlots =
-                      await widget.apiService.fetchSlots();
-                  print('Fetched Slots: $fetchedSlots');
-                  setState(() {
-                    slots = fetchedSlots;
-                  });
+                  var dataSnapshot = await widget.apiService.fetchSlots();
+                  if (dataSnapshot != null) {
+                    var slotsData = dataSnapshot.value as Map<dynamic, dynamic>;
+                    List<Map<String, dynamic>> fetchedSlots = [];
+                    slotsData.forEach((key, value) {
+                      fetchedSlots.add({
+                        'slotNumber': key,
+                        'status': value['availability'],
+                        'entryTime': value['entry_time'],
+                        'exitTime': value['exit_time'],
+                        'occupancyStatus': value['occupancy_status'],
+                        'totalDuration': value['total_duration'],
+                      });
+                    });
+                    setState(() {
+                      slots = fetchedSlots;
+                    });
+                  } else {
+                    print('Fetched slots are null');
+                  }
                 } catch (e) {
                   print('Error fetching slots: $e');
                 }
@@ -52,9 +66,10 @@ class _ParkingScreenState extends State<ParkingScreen> {
               child: ListView.builder(
                 itemCount: slots.length,
                 itemBuilder: (context, index) {
-                  Color buttonColor = slots[index]['status'] == 'available'
+                  Color buttonColor = slots[index]['status'] == true //bool value not string
                       ? Colors.green
                       : Colors.red;
+                  print('Slot ${slots[index]['slotNumber']} status: ${slots[index]['status']}');
 
                   return ListTile(
                     title: ElevatedButton(
