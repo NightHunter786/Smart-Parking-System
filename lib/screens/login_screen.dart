@@ -19,6 +19,7 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Login'),
       ),
+      backgroundColor: Colors.blueGrey, // Set background color here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -96,6 +97,7 @@ class RegistrationScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Registration'),
       ),
+      backgroundColor: Colors.blueGrey, // Set background color here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
