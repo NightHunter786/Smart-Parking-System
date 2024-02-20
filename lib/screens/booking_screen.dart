@@ -52,7 +52,10 @@ class _BookingScreenState extends State<BookingScreen> {
                 // Calculate total duration and cost
                 DateTime entryTime = _convertTimeOfDayToDateTime(_selectedEntryTime);
                 DateTime exitTime = _convertTimeOfDayToDateTime(_selectedExitTime);
-                widget.apiService.bookSlot(widget.slotNumber, entryTime, exitTime);
+                Duration totalDuration = exitTime.difference(entryTime);
+
+                // Perform booking
+                widget.apiService.bookSlot(widget.slotNumber, entryTime, exitTime, totalDuration);
                 // Navigate back to ParkingScreen
                 Navigator.pop(context);
               },
