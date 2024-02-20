@@ -17,23 +17,33 @@ class ApiService {
 }
 
 DateTime _parseTime(String timeString) {
-  final now = DateTime.now();
-  final parts = timeString.split(':');
-  return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+  return DateTime.parse(timeString);
 }
+Duration parseDuration(String durationString) {
+    // Split the durationString to extract hours, minutes, and seconds
+    List<String> parts = durationString.split(':');
 
-  Future<void> bookSlot(int slotNumber, DateTime entryTime, DateTime exitTime, Duration totalDuration) async {
+    // Convert hours, minutes, and seconds strings to integers
+    int hours = int.parse(parts[0]);
+    int minutes = int.parse(parts[1]);
+    int seconds = int.parse(parts[2]);
+
+    // Create and return the Duration object
+    return Duration(hours: hours, minutes: minutes, seconds: seconds);
+  }
+
+  Future<void> bookSlot(int slotNumber, DateTime startTime, DateTime endTime, Duration totalDuration) async {
     try {
       // Perform booking logic here
       // Update database to mark the slot as booked
       // For example:
       await _database.child('parking_slots').child('slot$slotNumber').update({
-        'entry_time': entryTime.toString(),
-        'exit_time': exitTime.toString(),
+        'book_time_start': startTime.toString(),
+        'book_time_end': endTime.toString(),
         'availability': false,
         'occupancy_status': true,
-        'total_duration': totalDuration.toString(),
-      });
+        //'total_duration': totalDuration.toString(), // Calculate total duration
+    });
     } catch (e) {
       print('Error booking slot: $e');
       throw e;

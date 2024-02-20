@@ -22,6 +22,21 @@ class _ParkingScreenState extends State<ParkingScreen> {
   List<Map<String, dynamic>> slots = [];
   late Timer _timer; // Timer for periodic time check
 
+  DateTime _parseTime(String timeString) {
+  try {
+    // Try parsing as DateTime
+    return DateTime.parse(timeString);
+  } catch (_) {
+    // If parsing as DateTime fails, handle it as TimeOfDay
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    final second = int.parse(parts[2]);
+    return DateTime(0, 0, 0, hour, minute, second);
+  }
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -53,12 +68,15 @@ class _ParkingScreenState extends State<ParkingScreen> {
     });
   }
 
-  TimeOfDay _parseTime(String timeString) {
-    final parts = timeString.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = int.parse(parts[1]);
-    return TimeOfDay(hour: hour, minute: minute);
+  DateTime _parseDateTime(String dateTimeString) {
+  try {
+    return DateTime.parse(dateTimeString);
+  } catch (e) {
+    // Handle the error, and return a default value or show an error message
+    print('Error parsing date: $e');
+    return DateTime.now(); // Return a default value, or handle differently based on your requirements
   }
+}
 
 
   @override
