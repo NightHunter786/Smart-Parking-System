@@ -6,16 +6,21 @@ class ApiService {
   ApiService({required DatabaseReference database}) : _database = database;
 
   Future<DataSnapshot> fetchSlots() async {
-    try {
-      // Use the `once()` method to listen for a single event
-      DatabaseEvent event = await _database.child('parking_slots').once();
-      DataSnapshot dataSnapshot = event.snapshot; // Get the DataSnapshot from the DatabaseEvent
-      return dataSnapshot;
-    } catch (e) {
-      print('Error fetching slots: $e');
-      throw e;
-    }
+  try {
+    DatabaseEvent event = await _database.child('parking_slots').once();
+    DataSnapshot dataSnapshot = event.snapshot;
+    return dataSnapshot;
+  } catch (e) {
+    print('Error fetching slots: $e');
+    rethrow;
   }
+}
+
+DateTime _parseTime(String timeString) {
+  final now = DateTime.now();
+  final parts = timeString.split(':');
+  return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+}
 
   Future<void> bookSlot(int slotNumber, DateTime entryTime, DateTime exitTime, Duration totalDuration) async {
     try {

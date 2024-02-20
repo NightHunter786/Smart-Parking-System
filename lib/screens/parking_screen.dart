@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../services/api_service.dart';
-import 'booking_screen.dart'; // Import BookingScreen widget
-
-
+import 'booking_screen.dart';
+import 'dart:async';
+import 'dart:core';
 
 class ParkingScreen extends StatefulWidget {
   final ApiService apiService;
@@ -13,13 +14,56 @@ class ParkingScreen extends StatefulWidget {
   _ParkingScreenState createState() => _ParkingScreenState();
 }
 
+DateTime parseDateTime(String dateTimeString) {
+  return DateTime.parse(dateTimeString);
+}
+
 class _ParkingScreenState extends State<ParkingScreen> {
   List<Map<String, dynamic>> slots = [];
+  late Timer _timer; // Timer for periodic time check
+
+  @override
+  void initState() {
+    super.initState();
+    // Start the timer to periodically update slot statuses
+    _timer = Timer.periodic(Duration(minutes: 1), (_) {
+      updateSlotStatus(); // Call function to update slot statuses
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
+  }
+
+  void updateSlotStatus() {
+    // Get current time
+    DateTime currentTime = DateTime.now();
+    // Update slot status based on exit time
+    setState(() {
+      slots.forEach((slot) {
+        // Check if current time is after exit time
+        if (currentTime.isAfter(slot['exitTime'])) {
+          slot['status'] = true; // Slot is available
+        } else {
+          slot['status'] = false; // Slot is not available
+        }
+      });
+    });
+  }
+
+  TimeOfDay _parseTime(String timeString) {
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    double buttonWidth = MediaQuery.of(context).size.width *
-        0.3; // Adjust the percentage as needed
+    double buttonWidth = MediaQuery.of(context).size.width * 0.3;
 
     return Scaffold(
       appBar: AppBar(
@@ -44,13 +88,11 @@ class _ParkingScreenState extends State<ParkingScreen> {
                         dataSnapshot.value as Map<dynamic, dynamic>;
                     List<Map<String, dynamic>> fetchedSlots = [];
                     slotsData.forEach((key, value) {
-                      // Add this print statement to inspect the availability values
-                      print('Availability for slot $key: ${value['availability']}');
                       fetchedSlots.add({
                         'slotNumber': key,
                         'status': value['availability'] == true,
-                        'entryTime': value['entry_time'],
-                        'exitTime': value['exit_time'],
+                        'entryTime': _parseTime(value['entry_time']),
+                        'exitTime': _parseTime(value['exit_time']),
                         'occupancyStatus': value['occupancy_status'],
                         'totalDuration': value['total_duration'],
                       });
@@ -73,28 +115,25 @@ class _ParkingScreenState extends State<ParkingScreen> {
               child: ListView.builder(
                 itemCount: slots.length,
                 itemBuilder: (context, index) {
-                  Color buttonColor = slots[index]['status'] == true //bool value not string
+                  Color buttonColor = slots[index]['status'] == true
                       ? Colors.green
                       : Colors.red;
-                  print(
-                      'Slot ${slots[index]['slotNumber']} status: ${slots[index]['status']}');
-
                   return ListTile(
                     title: ElevatedButton(
                       onPressed: () {
                         if (slots[index]['status'] == true) {
-                          // Navigate to BookingScreen if slot is available
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => BookingScreen(
-                                slotNumber: int.parse(slots[index]['slotNumber'].replaceAll('slot', '')),
-                                apiService: widget.apiService, // Pass the ApiService instance
+                                slotNumber: int.parse(
+                                    slots[index]['slotNumber']
+                                        .replaceAll('slot', '')),
+                                apiService: widget.apiService,
                               ),
                             ),
                           );
                         } else {
-                          // Show snackbar indicating slot is unavailable
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Slot is unavailable'),
