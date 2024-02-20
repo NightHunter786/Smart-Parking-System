@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class BookingScreen extends StatefulWidget {
   final int slotNumber;
+  final ApiService apiService;
 
-  BookingScreen({required this.slotNumber});
+  BookingScreen({required this.slotNumber, required this.apiService});
 
   @override
   _BookingScreenState createState() => _BookingScreenState();
@@ -48,7 +50,11 @@ class _BookingScreenState extends State<BookingScreen> {
             ElevatedButton(
               onPressed: () {
                 // Calculate total duration and cost
-                // Perform booking
+                DateTime entryTime = _convertTimeOfDayToDateTime(_selectedEntryTime);
+                DateTime exitTime = _convertTimeOfDayToDateTime(_selectedExitTime);
+                widget.apiService.bookSlot(widget.slotNumber, entryTime, exitTime);
+                // Navigate back to ParkingScreen
+                Navigator.pop(context);
               },
               child: Text('Book Slot'),
             ),
@@ -82,5 +88,10 @@ class _BookingScreenState extends State<BookingScreen> {
         _selectedExitTime = pickedTime;
       });
     }
+  }
+
+  DateTime _convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
   }
 }

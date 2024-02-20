@@ -16,4 +16,21 @@ class ApiService {
       throw e;
     }
   }
+
+  Future<void> bookSlot(int slotNumber, DateTime entryTime, DateTime exitTime) async {
+    try {
+      // Perform booking logic here
+      // Update database to mark the slot as booked
+      // For example:
+      await _database.child('parking_slots').child('slot$slotNumber').update({
+        'entry_time': entryTime.toString(),
+        'exit_time': exitTime.toString(),
+        'availability': false,
+        'occupancy_status': true,
+      });
+    } catch (e) {
+      print('Error booking slot: $e');
+      throw e;
+    }
+  }
 }

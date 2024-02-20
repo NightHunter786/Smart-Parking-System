@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'booking_screen.dart'; // Import BookingScreen widget
 
+
+
 class ParkingScreen extends StatefulWidget {
   final ApiService apiService;
 
@@ -87,6 +89,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
                             MaterialPageRoute(
                               builder: (context) => BookingScreen(
                                 slotNumber: int.parse(slots[index]['slotNumber'].replaceAll('slot', '')),
+                                apiService: widget.apiService, // Pass the ApiService instance
                               ),
                             ),
                           );
