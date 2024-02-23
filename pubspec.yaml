@@ -36,6 +36,8 @@ dependencies:
   cloud_firestore: ^4.13.6
   flutter:
     sdk: flutter
+  esewa_flutter_sdk:
+    path: ./esewa_flutter_sdk
   #firebase_core: ^1.11.0
   firebase_database: ^10.4.0
   mockito: ^5.0.0
