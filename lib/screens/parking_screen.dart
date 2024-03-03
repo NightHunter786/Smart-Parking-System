@@ -36,7 +36,6 @@ class _ParkingScreenState extends State<ParkingScreen> {
   }
 }
 
-
   @override
   void initState() {
     super.initState();
