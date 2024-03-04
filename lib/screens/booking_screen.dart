@@ -149,6 +149,6 @@ class _BookingScreenState extends State<BookingScreen> {
   DateTime _convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
     final now = DateTime.now();
     return DateTime(
-        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
+    now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute, 0);
   }
 }

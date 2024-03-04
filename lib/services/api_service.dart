@@ -7,19 +7,20 @@ class ApiService {
 
   Future<DataSnapshot> fetchSlots() async {
   try {
-    DatabaseEvent event = await _database.child('parking_slots').once();
+    DatabaseEvent event = await _database.child('parking_slot').once();
     DataSnapshot dataSnapshot = event.snapshot;
+
     return dataSnapshot;
   } catch (e) {
     print('Error fetching slots: $e');
     rethrow;
   }
 }
+  DateTime _parseTime(String timeString) {
+    return DateTime.parse(timeString);
+  }
 
-DateTime _parseTime(String timeString) {
-  return DateTime.parse(timeString);
-}
-Duration parseDuration(String durationString) {
+  Duration parseDuration(String durationString) {
     // Split the durationString to extract hours, minutes, and seconds
     List<String> parts = durationString.split(':');
 
@@ -43,7 +44,7 @@ Duration parseDuration(String durationString) {
         'availability': false,
         'occupancy_status': true,
         //'total_duration': totalDuration.toString(), // Calculate total duration
-    });
+      });
     } catch (e) {
       print('Error booking slot: $e');
       throw e;
