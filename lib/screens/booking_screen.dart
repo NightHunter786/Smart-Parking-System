@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_parking/constant/esewa.dart';
 import '../services/api_service.dart';
+import 'package:intl/intl.dart';
 import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart';
 import "package:esewa_flutter_sdk/esewa_config.dart";
 import "package:esewa_flutter_sdk/esewa_payment.dart";
@@ -124,6 +125,10 @@ class _BookingScreenState extends State<BookingScreen> {
   void _bookSlot() {
     DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
     DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+
+    // Format start and end times
+    String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
+    String formattedEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
 
     // Calculate total duration
     Duration totalDuration = endTime.difference(startTime);

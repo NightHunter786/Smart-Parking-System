@@ -158,9 +158,13 @@ class _ParkingScreenState extends State<ParkingScreen> {
                           );
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        primary: buttonColor,
-                        fixedSize: Size(buttonWidth, 40),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          slots[index]['status'] == true ? Colors.green : Colors.red,
+                        ),
+                        fixedSize: MaterialStateProperty.all<Size>(
+                          Size(buttonWidth, 40),
+                        ),
                       ),
                       child: Text('Slot ${slots[index]['slotNumber']}'),
                     ),
