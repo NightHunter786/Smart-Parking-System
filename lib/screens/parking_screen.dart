@@ -129,7 +129,7 @@ DateTime _parseFullTime(String timeString) {
                   return ListTile(
                     title: ElevatedButton(
                       onPressed: () {
-                        if (!slots[index]['status']) {
+                        if (slots[index]['status']) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
