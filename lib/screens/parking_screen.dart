@@ -98,6 +98,12 @@ DateTime _parseFullTime(String timeString) {
   }
 }
 
+Future<bool> isSlotBookedDuringTime(int slotNumber, DateTime startTime, DateTime endTime) async {
+    // Query the booking_info label for overlapping bookings
+    // Implement this method in ApiService to check for overlapping bookings
+    return await _apiService.isSlotBookedDuringTime(slotNumber, startTime, endTime);
+}
+
   @override
   Widget build(BuildContext context) {
     double buttonWidth = MediaQuery.of(context).size.width * 0.3;

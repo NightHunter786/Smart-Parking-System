@@ -122,33 +122,53 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   // Method to book the slot
-  void _bookSlot() {
-    DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
-    DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+  void _bookSlot() async {
+  DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
+  DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
 
-    // Format start and end times
-    String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
-    String formattedEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
+  // Check if the slot is already booked during the selected time range
+  bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(
+    widget.slotNumber,
+    startTime,
+    endTime,
+  );
 
-    // Calculate total duration
-    Duration totalDuration = endTime.difference(startTime);
-
-    // Perform booking
-    widget.apiService.bookSlot(
-      widget.slotNumber, // Slot number
-      startTime, // Booking start time
-      endTime, // Booking end time
-      totalDuration, // Total duration
+  if (isSlotBooked) {
+    // Slot is already booked, show message to the user
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Slot is already booked for the selected time range.'),
+      ),
     );
-
-    // Navigate back to the previous screen
-    Navigator.pop(context);
+    return; // Exit the method
   }
+
+  // Format start and end times
+  String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
+  String formattedEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
+
+  // Calculate total duration
+  Duration totalDuration = endTime.difference(startTime);
+
+  // Create a map to store booking information
+  Map<String, dynamic> bookingData = {
+    'booking_start_time': formattedStartTime,
+    'booking_end_time': formattedEndTime,
+    'duration': totalDuration.inMinutes,
+    // Add other booking information such as cost, etc.
+  };
+
+  // Store booking information in the 'booking_info' label
+  widget.apiService.storeBookingInfo(widget.slotNumber, bookingData);
+
+  // Navigate back to the previous screen
+  Navigator.pop(context);
+}
 
   // Method to convert TimeOfDay to DateTime
   DateTime _convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
     final now = DateTime.now();
     return DateTime(
-    now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute, 0);
+      now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute, 0);
   }
 }
