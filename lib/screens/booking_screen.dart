@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:smart_parking/constant/esewa.dart';
+//import 'package:smart_parking/constant/esewa.dart';
 import '../services/api_service.dart';
 import 'package:intl/intl.dart';
-import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart';
-import "package:esewa_flutter_sdk/esewa_config.dart";
-import "package:esewa_flutter_sdk/esewa_payment.dart";
-import "package:esewa_flutter_sdk/esewa_payment_success_result.dart";
+import 'payment_screen.dart';
+//import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart';
+//import "package:esewa_flutter_sdk/esewa_config.dart";
+//import "package:esewa_flutter_sdk/esewa_payment.dart";
+//import "package:esewa_flutter_sdk/esewa_payment_success_result.dart";
+//import 'package:esewa_flutter/esewa_flutter.dart';
+//import 'package:flutter/foundation.dart';
 
 class BookingScreen extends StatefulWidget {
   final int slotNumber;
@@ -37,29 +40,13 @@ class _BookingScreenState extends State<BookingScreen> {
         _estimatedCost = totalCost;
       });
 
-      EsewaFlutterSdk.initPayment(
-        esewaConfig: EsewaConfig(
-          environment: Environment.test,
-          clientId: "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R",
-          secretId: "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==",
-        ),
-        esewaPayment: EsewaPayment(
-          productId: "1d71jd81",
-          productName: "Product One",
-          productPrice: totalCost.toString(), // Pass the total cost as a string
-          callbackUrl: "https://example.com/callback",
-        ),
-        onPaymentSuccess: (EsewaPaymentSuccessResult data) {
-          // Perform booking after successful payment
-          _bookSlot();
-        },
-        onPaymentFailure: (data) {
-          debugPrint("FAILURE");
-        },
-        onPaymentCancellation: (data) {
-          debugPrint("CANCELLATION");
-        },
-      );
+      // Navigate to the payment screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(), // Use the PaymentScreen constructor
+      ),
+    );
     } catch (e) {
       debugPrint("EXCEPTION");
     }
