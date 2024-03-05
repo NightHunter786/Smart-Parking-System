@@ -59,16 +59,32 @@ class ApiService {
 Future<bool> isSlotBookedDuringTime(int slotNumber, DateTime startTime, DateTime endTime) async {
   try {
     DataSnapshot snapshot = (await _database.child('booking_info').child('slot$slotNumber').once()).snapshot;
+    print('Snapshot: $snapshot');
 
     if (snapshot.value != null) {
       Map<dynamic, dynamic> bookings = snapshot.value as Map<dynamic, dynamic>;
       for (var booking in bookings.values) {
-        DateTime bookingStartTime = DateTime.parse(booking['startTime']);
-        DateTime bookingEndTime = DateTime.parse(booking['endTime']);
+        print('Booking start time type: ${booking['booking_start_time'].runtimeType}');
+        print('Booking end time type: ${booking['booking_end_time'].runtimeType}');
 
-        if ((bookingStartTime.isBefore(endTime) || bookingStartTime.isAtSameMomentAs(endTime)) &&
-            (bookingEndTime.isAfter(startTime) || bookingEndTime.isAtSameMomentAs(startTime))) {
-          return true;
+        DateTime? bookingStartTime;
+        DateTime? bookingEndTime;
+        try {
+          bookingStartTime = DateTime.parse(booking['booking_start_time'] ?? '');
+        } catch (e) {
+          print('Error parsing booking start time: $e');
+        }
+        try {
+          bookingEndTime = DateTime.parse(booking['booking_end_time'] ?? '');
+        } catch (e) {
+          print('Error parsing booking end time: $e');
+        }
+
+        if (bookingStartTime != null && bookingEndTime != null) {
+          if ((bookingStartTime.isBefore(endTime) || bookingStartTime.isAtSameMomentAs(endTime)) &&
+              (bookingEndTime.isAfter(startTime) || bookingEndTime.isAtSameMomentAs(startTime))) {
+            return true;
+          }
         }
       }
     }

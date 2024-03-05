@@ -126,21 +126,24 @@ class _BookingScreenState extends State<BookingScreen> {
   DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
   DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
 
-  // Check if the slot is already booked during the selected time range
-  bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(
-    widget.slotNumber,
-    startTime,
-    endTime,
-  );
-
+  // Check if the slot is already booked during the selected time
+  bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(widget.slotNumber, startTime, endTime);
   if (isSlotBooked) {
-    // Slot is already booked, show message to the user
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Slot is already booked for the selected time range.'),
+    // Show a dialog or toast indicating that the slot is already booked
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Slot Unavailable'),
+        content: Text('Sorry, the selected slot is already booked during this time.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
       ),
     );
-    return; // Exit the method
+    return;
   }
 
   // Format start and end times
