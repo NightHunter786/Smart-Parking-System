@@ -41,8 +41,16 @@ class ApiService {
     // Get a reference to the slot under 'booking_info'
     DatabaseReference slotRef = bookingInfoRef.child('slot$slotNumber');
 
+    // Convert booking start and end times to strings in the desired format
+    String bookingStartTime = bookingData['booking_start_time'].toString().substring(0, 19);
+    String bookingEndTime = bookingData['booking_end_time'].toString().substring(0, 19);
+
     // Store booking information under the slot reference
-    await slotRef.set(bookingData);
+    await slotRef.set({
+      'booking_start_time': bookingStartTime,
+      'booking_end_time': bookingEndTime,
+      'duration': bookingData['duration'],
+    });
   }
 
   Future<DataSnapshot> retrieveSlotsData() async {
@@ -59,31 +67,34 @@ class ApiService {
 Future<bool> isSlotBookedDuringTime(int slotNumber, DateTime startTime, DateTime endTime) async {
   try {
     DataSnapshot snapshot = (await _database.child('booking_info').child('slot$slotNumber').once()).snapshot;
-    print('Snapshot: $snapshot');
 
     if (snapshot.value != null) {
       Map<dynamic, dynamic> bookings = snapshot.value as Map<dynamic, dynamic>;
       for (var booking in bookings.values) {
-        print('Booking start time type: ${booking['booking_start_time'].runtimeType}');
-        print('Booking end time type: ${booking['booking_end_time'].runtimeType}');
+        print('Booking data: $booking'); // Print out the booking data
 
-        DateTime? bookingStartTime;
-        DateTime? bookingEndTime;
-        try {
-          bookingStartTime = DateTime.parse(booking['booking_start_time'] ?? '');
-        } catch (e) {
-          print('Error parsing booking start time: $e');
-        }
-        try {
-          bookingEndTime = DateTime.parse(booking['booking_end_time'] ?? '');
-        } catch (e) {
-          print('Error parsing booking end time: $e');
-        }
+        // Check if booking contains the necessary fields
+        if (booking != null && booking is Map<dynamic, dynamic> && booking.containsKey('booking_start_time') && booking.containsKey('booking_end_time')) {
+          DateTime? bookingStartTime;
+          DateTime? bookingEndTime;
 
-        if (bookingStartTime != null && bookingEndTime != null) {
-          if ((bookingStartTime.isBefore(endTime) || bookingStartTime.isAtSameMomentAs(endTime)) &&
-              (bookingEndTime.isAfter(startTime) || bookingEndTime.isAtSameMomentAs(startTime))) {
-            return true;
+          // Convert booking start and end times from strings to DateTime objects
+          try {
+            bookingStartTime = DateTime.parse(booking['booking_start_time']);
+          } catch (e) {
+            print('Error parsing booking start time: $e');
+          }
+          try {
+            bookingEndTime = DateTime.parse(booking['booking_end_time']);
+          } catch (e) {
+            print('Error parsing booking end time: $e');
+          }
+
+          if (bookingStartTime != null && bookingEndTime != null) {
+            if ((bookingStartTime.isBefore(endTime) || bookingStartTime.isAtSameMomentAs(endTime)) &&
+                (bookingEndTime.isAfter(startTime) || bookingEndTime.isAtSameMomentAs(startTime))) {
+              return true;
+            }
           }
         }
       }
