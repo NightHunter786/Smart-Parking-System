@@ -5,6 +5,16 @@ class ApiService {
 
   ApiService({required DatabaseReference database}) : _database = database;
 
+  double calculateCost(Duration duration, double hourlyRate) {
+    // Calculate the number of hours (rounded up to the nearest hour)
+    int hours = duration.inHours + (duration.inMinutes % 60 > 0 ? 1 : 0);
+
+    // Calculate the total cost
+    double cost = hours * hourlyRate;
+
+    return cost;
+  }
+
   Future<DataSnapshot> fetchSlots() async {
     try {
       DatabaseEvent event = await _database.child('parking_slot').once();
@@ -50,6 +60,7 @@ class ApiService {
       'booking_start_time': bookingStartTime,
       'booking_end_time': bookingEndTime,
       'duration': bookingData['duration'],
+      'cost': bookingData['cost'],
     });
   }
 

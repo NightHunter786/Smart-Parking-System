@@ -20,9 +20,23 @@ class BookingScreen extends StatefulWidget {
 class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay _selectedStartTime = TimeOfDay.now();
   TimeOfDay _selectedEndTime = TimeOfDay.now();
+  double _estimatedCost = 0.0;
 
   void _handlePayment() {
     try {
+      // Calculate the estimated cost when handling payment
+      DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
+      DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+      Duration duration = endTime.difference(startTime);
+      double ratePerMinute = 50.0 / 30.0; // Cost per minute
+      double totalCost = duration.inMinutes * ratePerMinute;
+      totalCost = (totalCost / 10).ceil() * 10; // Round off to nearest tens place
+
+      // Update the estimated cost
+      setState(() {
+        _estimatedCost = totalCost;
+      });
+
       EsewaFlutterSdk.initPayment(
         esewaConfig: EsewaConfig(
           environment: Environment.test,
@@ -32,7 +46,7 @@ class _BookingScreenState extends State<BookingScreen> {
         esewaPayment: EsewaPayment(
           productId: "1d71jd81",
           productName: "Product One",
-          productPrice: "20",
+          productPrice: totalCost.toString(), // Pass the total cost as a string
           callbackUrl: "https://example.com/callback",
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult data) {
@@ -91,6 +105,11 @@ class _BookingScreenState extends State<BookingScreen> {
               child: Text('Select End Time'),
             ),
             SizedBox(height: 20),
+            Text(
+              'Estimated Cost: \$${_estimatedCost.toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Handle payment
@@ -118,55 +137,81 @@ class _BookingScreenState extends State<BookingScreen> {
       initialTime: TimeOfDay.now(),
     );
 
+    // Recalculate the estimated cost when the user selects the start or end time
+    if (pickedTime != null) {
+      DateTime startTime = _convertTimeOfDayToDateTime(pickedTime);
+      DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+      Duration duration = endTime.difference(startTime);
+      double ratePerMinute = 50.0 / 30.0; // Cost per minute
+      double totalCost = duration.inMinutes * ratePerMinute;
+      totalCost = (totalCost / 10).ceil() * 10; // Round off to nearest tens place
+      setState(() {
+        _estimatedCost = totalCost;
+      });
+    }
+
     return pickedTime ?? TimeOfDay.now();
   }
 
   // Method to book the slot
   void _bookSlot() async {
-  DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
-  DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+    DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
+    DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
+    Duration duration = endTime.difference(startTime);
 
-  // Check if the slot is already booked during the selected time
-  bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(widget.slotNumber, startTime, endTime);
-  if (isSlotBooked) {
-    // Show a dialog or toast indicating that the slot is already booked
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Slot Unavailable'),
-        content: Text('Sorry, the selected slot is already booked during this time.'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-    return;
+    // Calculate the cost based on the duration and rate per minute
+    double ratePerMinute = 50.0 / 30.0; // Cost per minute
+    double totalCost = duration.inMinutes * ratePerMinute;
+    // Round off the total cost to the nearest tens place
+    totalCost = (totalCost / 10).ceil() * 10;
+
+    // Update the estimated cost
+    setState(() {
+      _estimatedCost = totalCost;
+    });
+
+    // Check if the slot is already booked during the selected time
+    bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(widget.slotNumber, startTime, endTime);
+    if (isSlotBooked) {
+      // Show a dialog or toast indicating that the slot is already booked
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Slot Unavailable'),
+          content: Text('Sorry, the selected slot is already booked during this time.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Format start and end times
+    String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
+    String formattedEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
+
+    // Calculate total duration
+    Duration totalDuration = endTime.difference(startTime);
+
+    // Create a map to store booking information
+    Map<String, dynamic> bookingData = {
+      'booking_start_time': formattedStartTime,
+      'booking_end_time': formattedEndTime,
+      'duration': totalDuration.inMinutes,
+      'cost': totalCost,
+      // Add other booking information such as cost, etc.
+    };
+
+    // Store booking information in the 'booking_info' label
+    widget.apiService.storeBookingInfo(widget.slotNumber, bookingData);
+
+    // Navigate back to the previous screen
+    Navigator.pop(context);
   }
-
-  // Format start and end times
-  String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
-  String formattedEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
-
-  // Calculate total duration
-  Duration totalDuration = endTime.difference(startTime);
-
-  // Create a map to store booking information
-  Map<String, dynamic> bookingData = {
-    'booking_start_time': formattedStartTime,
-    'booking_end_time': formattedEndTime,
-    'duration': totalDuration.inMinutes,
-    // Add other booking information such as cost, etc.
-  };
-
-  // Store booking information in the 'booking_info' label
-  widget.apiService.storeBookingInfo(widget.slotNumber, bookingData);
-
-  // Navigate back to the previous screen
-  Navigator.pop(context);
-}
 
   // Method to convert TimeOfDay to DateTime
   DateTime _convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
