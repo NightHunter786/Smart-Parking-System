@@ -163,18 +163,6 @@ class _BookingScreenState extends State<BookingScreen> {
   print("Booking data: Start Time: $_selectedStartTime, End Time: $_selectedEndTime");
     DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
     DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
-    Duration duration = endTime.difference(startTime);
-
-    // Calculate the cost based on the duration and rate per minute
-    double ratePerMinute = 50.0 / 30.0; // Cost per minute
-    double totalCost = duration.inMinutes * ratePerMinute;
-    // Round off the total cost to the nearest tens place
-    totalCost = (totalCost / 10).ceil() * 10;
-
-    // Update the estimated cost
-    setState(() {
-      _estimatedCost = totalCost;
-    });
 
     // Check if the slot is already booked during the selected time
     bool isSlotBooked = await widget.apiService.isSlotBookedDuringTime(widget.slotNumber, startTime, endTime);
@@ -195,6 +183,19 @@ class _BookingScreenState extends State<BookingScreen> {
       );
       return;
     }
+
+    // Calculate the cost based on the duration and rate per minute
+    Duration duration = endTime.difference(startTime);
+    double ratePerMinute = 50.0 / 30.0; // Cost per minute
+    double totalCost = duration.inMinutes * ratePerMinute;
+    // Round off the total cost to the nearest tens place
+    totalCost = (totalCost / 10).ceil() * 10;
+
+    // Update the estimated cost
+    setState(() {
+      _estimatedCost = totalCost;
+    });
+
 
     // Format start and end times
     String formattedStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
