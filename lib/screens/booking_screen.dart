@@ -142,6 +142,25 @@ class _BookingScreenState extends State<BookingScreen> {
 
   // Method to book the slot
   void _bookSlot() async {
+    // Check if start and end times are selected
+  if (_selectedStartTime == TimeOfDay.now() || _selectedEndTime == TimeOfDay.now()) {
+    // Show a dialog or snackbar indicating that start and end times are required
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Times'),
+        content: Text('Please select both start and end times before booking.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return;
+  }
+  print("Booking data: Start Time: $_selectedStartTime, End Time: $_selectedEndTime");
     DateTime startTime = _convertTimeOfDayToDateTime(_selectedStartTime);
     DateTime endTime = _convertTimeOfDayToDateTime(_selectedEndTime);
     Duration duration = endTime.difference(startTime);

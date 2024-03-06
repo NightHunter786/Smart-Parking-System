@@ -61,7 +61,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "smart_parking"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -101,8 +101,8 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.android.support:multidex:2.0.1'
-    implementation 'com.android.support:appcompat-v7:31.0.0'
+    compile 'com.android.support:multidex:2.0.1'
+    compile 'com.android.support:appcompat-v7:31.0.0'
     implementation(name:'ibmmobilefirstplatformfoundation', ext:'aar')
   // Import the Firebase BoM
   implementation platform('com.google.firebase:firebase-bom:32.7.3')
