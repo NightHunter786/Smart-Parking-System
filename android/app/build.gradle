@@ -5,6 +5,15 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+    maven {
+        url "https://maven.google.com"
+    }
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -24,9 +33,13 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.smart_parking"
+    namespace "smart_parking"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+    compileSdkVersion 31 // Add
+    buildToolsVersion "31.0.0"
+    multiDexEnabled true
+    manifestPlaceholders = [applicationName: "Smart Parking"]
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -40,15 +53,23 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+        }
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "smart_parking"
+        minSdkVersion 22
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        //multiDexKeepProguard file("multidex-config.pro")
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
-        //minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -56,10 +77,18 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //multiDexEnabled true
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+    }
+    packagingOptions {
+        pickFirst 'META-INF/ASL2.0'
+        pickFirst 'META-INF/LICENSE'
+        pickFirst 'META-INF/NOTICE'
     }
 }
 
@@ -67,7 +96,14 @@ flutter {
     source '../..'
 }
 
+configurations.all {
+    resolutionStrategy.force 'com.android.support:multidex:2.0.1'
+}
+
 dependencies {
+    implementation 'com.android.support:multidex:2.0.1'
+    implementation 'com.android.support:appcompat-v7:31.0.0'
+    implementation(name:'ibmmobilefirstplatformfoundation', ext:'aar')
   // Import the Firebase BoM
   implementation platform('com.google.firebase:firebase-bom:32.7.3')
 
@@ -79,4 +115,9 @@ dependencies {
 
   // Add the dependencies for any other desired Firebase products
   // https://firebase.google.com/docs/android/setup#available-libraries
+}
+
+task(addUIActivity) << {
+    def manifestFile = file("src/main/AndroidManifest.xml")
+    // ...
 }

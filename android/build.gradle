@@ -3,11 +3,16 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.gms:google-services:4.4.0"
+        classpath 'com.android.tools.build:gradle:7.4.0'
     }
 }
 
@@ -20,7 +25,22 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
+    buildscript {
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile) {
+                options.compilerArgs << "-Xlint:deprecation"
+            }
+        }
+    }
+}
+
+android {
+    compileSdkVersion 31
 }
 
 rootProject.buildDir = '../build'
@@ -31,7 +51,3 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-
-android {
-    compileSdkVersion 31 // Add
-}
