@@ -4,14 +4,21 @@ import 'parking_screen.dart'; // Import the ParkingScreen
 import '../services/api_service.dart';
 import '../services/auth_service.dart'; // Import the AuthService
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   final ApiService apiService;
   final AuthService authService;
 
   LoginScreen({required this.apiService, required this.authService});
 
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,7 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      backgroundColor: Colors.lightBlue, // Set background color here
+      backgroundColor: Colors.lightBlue,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -28,30 +35,40 @@ class LoginScreen extends StatelessWidget {
             TextField(
               controller: usernameController,
               decoration: InputDecoration(
-                labelText: 'Username',
+                labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.black),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                  borderSide: BorderSide(color: Colors.black),
                 ),
               ),
             ),
             SizedBox(height: 16),
             TextField(
               controller: passwordController,
-              obscureText: true,
+              obscureText: _obscureText,
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle: TextStyle(color: Colors.black),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black), // Change line color when focused
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                  child: Icon(
+                    _obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
             SizedBox(height: 32),
             ElevatedButton(
               onPressed: () async {
-                // Simulate a login validation using the AuthService
-                bool loginSuccess = await authService.login(
+                bool loginSuccess = await widget.authService.login(
                   usernameController.text,
                   passwordController.text,
                 );
@@ -61,12 +78,16 @@ class LoginScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          ParkingScreen(apiService: apiService),
+                          ParkingScreen(apiService: widget.apiService),
                     ),
                   );
                 } else {
-                  // Show an error message or handle the failed login attempt
-                  print('Invalid credentials');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Invalid email or password'),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
                 }
               },
               child: Text('Login'),
@@ -74,13 +95,12 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the registration screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => RegistrationScreen(
-                      apiService: apiService,
-                      authService: authService,
+                      apiService: widget.apiService,
+                      authService: widget.authService,
                     ),
                   ),
                 );

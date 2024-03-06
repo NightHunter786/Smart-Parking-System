@@ -65,6 +65,7 @@ class ApiService {
   }
 
   Future<DataSnapshot> retrieveSlotsData() async {
+    
   try {
     DataSnapshot dataSnapshot = (await _database.child('parking_slot').once()).snapshot;
 
